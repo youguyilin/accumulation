@@ -1,0 +1,77 @@
+# android View 的绘制流程 #
+ android 中view之间是树结构的，每一个view的绘制主要包括measure、layout和draw方法
+整个view树的绘制是从ViewRootImpl类的performTraversals()方法开始的，该函数的执行过程主要是根据之前设置的状态，判断是否重新计算师视图大小(measure)、是否重新放置视图的位置（layout）、以及是否重新绘制（draw），其核心思想也就是通过判断选择顺序的执行者三个方法
+
+performTraversals这个方法的内部主要是传入参数以后走的是MATCH_PARENT，使用MeaureSpec方法组装一个MeasureSpec,MeasureSpec的specMode等于EXACTY,specSize等于windowSize，这样做解释了为什么根视图总是全屏显示
+
+## onMeasure ##
+view绘制的第一步主要是为整个view树计算实际的大小，然后设置实际的高和宽，每个View控件的实际宽高都是由父视图和自身共同决定的，实际的测量是在onMeasure方法中进行，所以在View的自雷需要重写onMeasure方法，因为measure是final的所以View子类只能通过重载来实现自己的测量逻辑
+
+这个方法的两个参数是由父类传过来的，也就是说代表了父view的规格，他由两部分组成，高2位表示MODE，定义在MeasureSpec类（View的内部类）中，有三种类型，包括
+- EXACTLY 表示确定大小
+- AT_MOST表示最大大小
+- UNSPECIFIED 不确定
+低30位表示size，也就是父View的大小。对于系统Window类的DecorView对象的Mode一般都为EXACTLY，而size分别对应屏幕的宽高，
+
+onMeasure方法的默认实现仅仅调用了setMeasureDimension方法，而setMeasureDimension函数是一个很关键的函数，其对View的成员变量mMeasuredHight和mMeasuredWidth变量赋值，measure的主要作用就是对每个View的mMeasuredWidth和mMeasuredHight进行赋值，其默认的赋值都是通过getDefaultSize返回的，在该方法的源码中可以看到，其中的specMode等于AT_MOTST或者EXACTLY就返回specSize，这就是系统默认的规格
+
+
+>ViewGroup类提供了measureChild，measureChildWithMargins方法简化了View的尺寸计算
+>只要是ViewGroup的子类就必须要求LayoutParams继承MarginLayoutParams，否则无法使用layout_margin参数
+
+## onLayout && layout ##
+在ViewRootImpl的performTraversals执行完mView.measure方法后会接着执行mView.layout，该方法接收四个参数，分别代表Parent的左上右下坐标，而且左和上都为0，右下分别为测量的width和height
+
+同理layout方法也是递归结构自定义view首先调用onMeasure进行测量，然后调用onLayout方法动态获取子View和子View的测量大小，然后进行layout布局，重载onlayout通常做法就是写一个for循环调用每一个子视图的layout函数，传入不同的参数来确定每一个子视图在俯视图中的显示位置
+
+一般情况下layout过程会参考measure过程中计算得到的mMeasuredHight和mMeasuredWidth来安排子View在父View中的位置，单着不是必须的，measure过程得到的结果可能完全没有实际用处，特别对于一些自定义ViewGroup，其子View的个数、位置、和大小都是固定的，这时候我们可以忽略整个measure的过程，只在layout函数中传入4个参数来安排每个字View的具体位置。
+
+View的layout方法可以被重载，VeiwGroup.layout为final的不可重载，ViewGroup.onLayout为抽象（abstract）的，子类必须重载实现自己的位置逻辑
+view的getWidth和getHeight方法来获取View测量的宽高，必须保证这两个方法在onLayout流程之后调用才能有有效的返回值
+
+## draw ##
+在ViewRootImp的performTraversals内部执行完measure、layout方法之后，执行mView.draw,其实此处的mView对于Activity来说就是PhoneWindow.DecorView,在ViewRootImpl中代码会创建一个Canvas对象，然后调用View的Draw()方法来执行具体的绘制，其也是view树递归的draw过程。ViewGroup没有draw方法
+
+整个view的draw方法主要为6步（忽略两步）
+1. 对view的背景进行绘制 通过运行drawBackground（canvas）方法绘制背景
+2. 对view的内容进行绘制 这用调用view的onDraw方法，这是一个空方法，需要由子类去实现具体逻辑
+4. 对当前view的所有子view进行绘制，如果没有子view就不需要进行绘制 主要是通过调用其中的dispatchDraw（canvas）方法，viewGroup会重写该方法，回去遍历每个子View，然后调用drawChild方法，drawChild方法调用了View的draw()方法所以说ViewGroup已经为我们重写了DispatchDraw的功能实现，
+5. 对View的滚动条进行绘制 会调用View的onDrawScrollBars方法
+
+
+# invalidate 和 postInvalidate #
+### invalidate ###
+View的invalidate方法实质是将要刷新区域直接传递给了父ViewGroup的invalidateChild方法，这是一个从当前向上级父view回溯的过程，每一层的父view都将自己的显示区域与传入的刷新Rect做交集，这个过程最后会传递到ViewRootImpl的invalidateChildInParent方法结束，该方法直接返回了null，在这之前会调用scheduleTraversals这个方法，该方法会通过Handler的Runnable发送一个异步消息，调用doTraversal方法，然后最终调用performTraversals执行重绘。
+
+
+---
+### postInvalidate ###
+invalidate方法只能在UI Thread中执行，在其他线程中需要使用postInvalidate方法，其中调用postInvalidateDelayed方法，该方法通过Handler发送了一条MSG_INVALIDATE消息，实质又是在UI Thread中调用View的invalidate方法。
+
+- 直接调用invalidate方法.请求重新draw，但只会绘制调用者本身。
+- 触发setSelection方法。请求重新draw，但只会绘制调用者本身。
+- 触发setVisibility方法。 当View可视状态在INVISIBLE转换VISIBLE时会间接- -调用invalidate方法，继而绘制该View。当View的可视状态在INVISIBLE
+- VISIBLE 转换为GONE状态时会间接调用requestLayout和invalidate方法，同
+- 由于View树大小发生了变化，所以会请求measure过程以及draw过程，同样只绘制需要“重新绘制”的视图。
+- 触发setEnabled方法。请求重新draw，但不会重新绘制任何View包括该调用者本身。
+- 触发requestFocus方法。请求View树的draw过程，只绘制“需要重绘”的View。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
