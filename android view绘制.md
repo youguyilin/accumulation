@@ -1,11 +1,11 @@
 # android View 的绘制流程 #
  android 中view之间是树结构的，每一个view的绘制主要包括measure、layout和draw方法
-整个view树的绘制是从ViewRootImpl类的performTraversals()方法开始的，该函数的执行过程主要是根据之前设置的状态，判断是否重新计算师视图大小(measure)、是否重新放置视图的位置（layout）、以及是否重新绘制（draw），其核心思想也就是通过判断选择顺序的执行者三个方法
+整个view树的绘制是从ViewRootImpl类的performTraversals()方法开始的，该函数的执行过程主要是根据之前设置的状态，判断是否重新计算视图大小(measure)、是否重新放置视图的位置（layout）、以及是否重新绘制（draw），其核心思想也就是通过判断选择顺序的执行者三个方法
 
 performTraversals这个方法的内部主要是传入参数以后走的是MATCH_PARENT，使用MeaureSpec方法组装一个MeasureSpec,MeasureSpec的specMode等于EXACTY,specSize等于windowSize，这样做解释了为什么根视图总是全屏显示
 
 ## onMeasure ##
-view绘制的第一步主要是为整个view树计算实际的大小，然后设置实际的高和宽，每个View控件的实际宽高都是由父视图和自身共同决定的，实际的测量是在onMeasure方法中进行，所以在View的自雷需要重写onMeasure方法，因为measure是final的所以View子类只能通过重载来实现自己的测量逻辑
+view绘制的第一步主要是为整个view树计算实际的大小，然后设置实际的高和宽，每个View控件的实际宽高都是由父视图和自身共同决定的，实际的测量是在onMeasure方法中进行，所以在View的自身需要重写onMeasure方法，因为measure是final的所以View子类只能通过重载来实现自己的测量逻辑
 
 这个方法的两个参数是由父类传过来的，也就是说代表了父view的规格，他由两部分组成，高2位表示MODE，定义在MeasureSpec类（View的内部类）中，有三种类型，包括
 - EXACTLY 表示确定大小
@@ -57,6 +57,9 @@ invalidate方法只能在UI Thread中执行，在其他线程中需要使用post
 - 触发requestFocus方法。请求View树的draw过程，只绘制“需要重绘”的View。
 
 
+# Adroid UI的层级关系 #
+Activity-->PhoneWindow-->DecorView-->titleView and ContentView
+PhoneWindow 是Android中最基本的窗口系统，每个Activity会创建一个。PhoneWindow是Activity和View系统交互的接口。DecorView本质上是一个FrameLayout，是Activity中所有View的祖先。
 
 
 
