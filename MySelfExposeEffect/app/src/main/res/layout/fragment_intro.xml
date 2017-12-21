@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="600dp"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/layout_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="_详情介绍_"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="20dp"
+                android:text="【紫石榴应用商店】是连连看全新推出的与连连看齐名的 面向全球的应用商店平台。 我们通过对市场的专业分析，对客户需求的探究和...【紫 石榴应用商店】是连连看全新推出的与连连看齐名的面向 全球的应用商店平台。我们通过对市场的专业分析，对客 户需求的探究和...【紫石榴应用商店】是连连看全新推出的与连连看齐名的 面向全球的应用商店平台。 我们通过对市场的专业分析，对客户需求的探究和...【紫 石榴应用商店】是连连看全新推出的与连连看齐名的面向 全球的应用商店平台。我们通过对市场的专业分析，对客 户需求的探究和...【紫石榴应用商店】是连连看全新推出的与连连看齐名的 面向全球的应用商店平台。 我们通过对市场的专业分析，对客户需求的探究和...【紫 石榴应用商店】是连连看全新推出的与连连看齐名的面向 全球的应用商店平台。我们通过对市场的专业分析，对客 户需求的探究和...【紫石榴应用商店】是连连看全新推出的与连连看齐名的 面向全球的应用商店平台。 我们通过对市场的专业分析，对客户需求的探究和...【紫 石榴应用商店】是连连看全新推出的与连连看齐名的面向 全球的应用商店平台。我们通过对市场的专业分析，对客 户需求的探究和..."
+                />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>
