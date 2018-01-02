@@ -63,7 +63,7 @@ With a tabbed document interface, PDF export, a built-in image uploader, session
  ![MOU ICON	](http://mouapp.com/Mou_128.png)
 
 ## 粗体 斜体 ##
-** 粗体 **
+**粗体**
 
 *斜体*
 
