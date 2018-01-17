@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MySelfExposeEffect</string>
+    <string name="title_activity_databinding">databinding</string>
 </resources>

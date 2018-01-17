@@ -7,7 +7,7 @@ performTraversals这个方法的内部主要是传入参数以后走的是MATCH_
 ## onMeasure ##
 view绘制的第一步主要是为整个view树计算实际的大小，然后设置实际的高和宽，每个View控件的实际宽高都是由父视图和自身共同决定的，实际的测量是在onMeasure方法中进行，所以在View的自身需要重写onMeasure方法，因为measure是final的所以View子类只能通过重载来实现自己的测量逻辑
 
-这个方法的两个参数是由父类传过来的，也就是说代表了父view的规格，他由两部分组成，高2位表示MODE，定义在MeasureSpec类（View的内部类）中，有三种类型，包括
+这个方法的两个参数是由父类传过来的，也就是说代表了父view的规格。MeasureSpec表示32位的整型值，他由两部分组成，高2位表示MODE，定义在MeasureSpec类（View的内部类）中，有三种类型，包括
 - EXACTLY 表示确定大小
 - AT_MOST表示最大大小
 - UNSPECIFIED 不确定
@@ -61,6 +61,8 @@ invalidate方法只能在UI Thread中执行，在其他线程中需要使用post
 Activity-->PhoneWindow-->DecorView-->titleView and ContentView
 PhoneWindow 是Android中最基本的窗口系统，每个Activity会创建一个。PhoneWindow是Activity和View系统交互的接口。DecorView本质上是一个FrameLayout，是Activity中所有View的祖先。
 
+## 总结
+当一个应用启动时，会启动一个主Activity,Android系统会根据Activity的布局来对它进行绘制。绘制会从根试图ViewRoot的performTraversals()方法开始，从上到下遍历整个视图树，每个View空间负责绘制自己，而ViewGroup还需要负责同志自己的子View进行绘制操作。
 
 
 

@@ -1,0 +1,29 @@
+## Retrofit
+确切地说，Retrofit并不是一个完整的网络请求函数库，而是将REST API转换成Java接口的一个开源函数库，它要服务器API接口遵循REST规范。基于注解使得代码变得很简洁，Retrofit默认情况下使用GSON作为JSON解析器，使用OkHttp实现网络请求，三者通常配合使用，当然我们也可配合其他函数库。HttpURLConnection、Apache HttpClient和OkHttp封装了底层的网络请求，而Android-async-http,Volley和Retrofit是基于前面三者的基础上二次开发而成。
+> 从使用来看，Retrofit就是冲当一个适配器（Adapter）的角色：将一个Java接口翻译成一个Http请求，然后用OkHttp去发送这个请求。Volley描述一个HTTP请求是需要创建一个Request对象，而执行这个请求，就是把这个请求对象放到一个队列中，在网络县城中用HttpUrlConnection去请求，Retrofit的实现方式就是Java动态代理——当你要调用某个Class方法前或后，插入你想要执行的代码。
+
+``	Call<ZhuangLanAuthor> call = api.getAuthor("qinchao"); 
+``
+上面的api对象其实是一个动态代理对象，并不是一个真正的ZhuangLanApi接口的implements产生的对象，当api对象调用getAuthor方法时会被动态代理拦截，然后调用Proxy.netProxyInstance方法中的InvocationHandler对象，它的invoke方法会传入3个参数：
+* Object proxy:代理对象，并不关心
+* Method method:调用的方法，就是getAuthor方法
+* Object... args:方法的参数，就是“qinchao”
+Retrofit关心的就是method和它的参数args，然后Retrofit就会用Java反射获取到getAuthor方法的注解信息，配合args参数,创建一个ServiceMethod对象，ServiceMethod就是一个中央处理器，传入Retrofit对象和Method对象，调用各个接口和解析器，最终生成一个Request,包含api的域名、path、http请求方法、请求头、是否有body、是否是multipart等，最后返回一个Call对象，Retrofit2中Call接口的默认实现是OkHttpCall,它默认使用Okhttp3作为底层http请求client
+使用Java动态代理的母的就是要拦截被调用Java方法，然后解析这个Java方法的注解，最后生成Request有OkHttp发送。
+## Retrofit的源码分析
+Retrofit源码组成：
+1. 一个retrofit2.http包，里面全部是定义HTTP请求的Java注解，比如GET、POST、PUT、DELETE、Header、Path、Query等
+2. 余下的retrofit2包中几个类和接口就是全部retrofit的代码了，代码很少，很简单，因为retrofit把网络请求这部分功能全部交给OkHttp了
+## Retrofit的运行过程
+上面说过创建api对象过程实际上是动态代理，会调用Proxy.newProxyInstance方法中的InvocationHandler对象，创建一个ServiceMethod对象
+## 创建ServiceMethod
+ServiceMethod就像是一个中央处理器
+第一步，获取到上面说到的3个接口对象：callAdapter\responseType\responseConverter
+第二部，解析Method的注解，主要就是获取Http请求的方法，
+第三步，如api中的参数占位符{user}，真实的参数值在Java方法中传入，那么Retrofit会使用一个ParameterHandler来进行替换。
+## 执行Http
+OkHttpCall是实现了Call接口的，并且是真正调用OkHttp3发送Http请求的类。OkHttp3发送一个Http请求需要一个Request对象，而这个Request对象就是从ServiceMethod的toRequest返回的。
+总的来说，OkHttpCall就是调用ServiceMethod获得一个可以执行的Request对象，然后等到Http请求返回后，再讲response body传入ServiceMethod中，ServiceMethod就可以调用Converter接口将response body转成一个Java对象
+Retrofit非常巧妙的用注解来描述一个HTTP请求，将一个HTTP请求抽象成一个Java接口，然后用Java动态代理的方式，动态的将这个接口的注解“翻译”成一个HTTP请求，最后执行这个HTTP请求。
+
+-----**好的代码就是依赖接口而不是实现**   面向接口的编程方法。
