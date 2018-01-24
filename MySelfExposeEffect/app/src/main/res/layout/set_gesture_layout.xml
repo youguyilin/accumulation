@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="返回"
+            android:layout_marginLeft="10dp"
+            android:textSize="16sp"
+            android:drawableLeft="@drawable/back"
+            android:textColor="@color/blue"
+            android:gravity="center_vertical"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:includeFontPadding="false"
+            android:layout_centerInParent="true"
+            android:text="设置手势密码"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+ <com.example.alex.myselfexposeeffect.widget.GesturePsw
+     android:id="@+id/gesture"
+     android:layout_width="match_parent"
+     android:layout_height="0dp"
+     android:layout_weight="1"
+     android:layout_marginLeft="40dp"
+     android:layout_marginRight="40dp"
+     android:layout_marginTop="40dp"
+     app:selectedBitmap = "@drawable/icon_finger_selected"
+     app:unSelectedBitmap = "@drawable/icon_finger_unselected"
+     app:selectedSmallBitmap = "@drawable/icon_finger_selected_small"
+     app:unSelectedSmallBitmap = "@drawable/icon_finger_unselected_small"
+     app:waitTime = "30"
+     app:maxFailTime = "5"
+     app:minPoint = "4"
+     app:paintColor="@color/blue"
+     app:paintTextSize="15sp"
+     />
+</LinearLayout>

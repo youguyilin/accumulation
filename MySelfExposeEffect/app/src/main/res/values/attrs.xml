@@ -4,4 +4,25 @@
         <attr name="indicatorWidth" format="reference|dimension"/>
         <attr name="indicatorColor" format="reference|color"/>
     </declare-styleable>
+    <!--模版应该具有通用性和可定制性-->
+    <declare-styleable name="SecurityCenter">
+        <!--选中状态的手势点-->
+        <attr name="selectedBitmap" format="reference"/>
+        <!--未选中状态的手势点-->
+        <attr name="unSelectedBitmap" format="reference"/>
+        <!--选中状态的手势小点-->
+        <attr name="selectedSmallBitmap" format="reference"/>
+        <!--未选中状态的手势小点-->
+        <attr name="unSelectedSmallBitmap" format="reference"/>
+        <!--验证失败后再次验证的拦截时间-->
+        <attr name="waitTime" format="integer"/>
+        <!--最大失败次数-->
+        <attr name="maxFailTime" format="integer"/>
+        <!--绘制最少连接点数-->
+        <attr name="minPoint" format="integer"/>
+        <!--字体的颜色-->
+        <attr name="paintColor" format="color"/>
+        <!--字体大小-->
+        <attr name="paintTextSize" format="dimension"/>
+    </declare-styleable>
 </resources>

@@ -3,6 +3,7 @@
     package="com.example.alex.myselfexposeeffect">
 
     <application
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -23,6 +24,8 @@
             android:name=".databinding.DatabindingActivity"
             android:label="@string/title_activity_databinding"
             android:theme="@style/AppTheme"></activity>
+        <activity android:name=".activity.CloseGesturePsw"/>
+        <activity android:name=".activity.SetGesturePsw"/>
     </application>
 
 </manifest>
