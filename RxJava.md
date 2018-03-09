@@ -185,3 +185,53 @@ Observable.subscribe(Subscriber)的内部实现是这样的（核心代码）：
 	obServable.subscribe(onNextAction,onErrorAction,onCompleteAction);
 
 其中Action1和Action0.Action0是RxJava的一个借口，它只有一个方法call()。这个方法是无参无返回值的，由于，onCompleted()方法也是无参无返回值的，因此Action0可以被当成一个包装对象，将onComplete()的内容打包起来将自己作为一个参数传入subscribe()以实现不完整定义的回调。Action1同理表示单参无返回值的包装方法。
+
+虽然Action0和Action1在API中使用最广泛，但RxJava是提供了多个ActionX形式的接口（例如Action2,Action3），它们可以被用以包装不同的无返回值的方法。
+
+### 举两个例子
+* 打印字符串数组
+将字符串数组names中的所有字符串一次打印出来：
+
+``
+
+	String[] names = ...;
+	Observable.from(name)
+	.subscribe(new Action1<String>() {
+		@Override
+		public void call(String name) {
+			Log.d(tag,name);
+		}
+	})
+
+* 由id取得图片并显示
+由指定的一个drawable文件id，drawableRes取得图片，并显示在ImageView中，并在出现异常的时候打印Toast报错：
+
+``
+
+	int drawableRes = ..;
+	ImageView imageView = ..;
+	Observable.create(new OnSubscribe<Drawable>() {
+		@Override
+		public void (Subscribe<? super Drawable> subscriber) {
+			Drawable drawable =  getTheme().getDrawable(drawableRes);
+			subscriber.onNext(drawable);
+			subscriber.onCompleted();
+		}
+	}).subscribe(new Observer<Drawable>() {
+		@Override
+		public void onNext(Drawable drawable){
+			imageView.setImageDrawable(drawable);
+		}
+	
+		@Override
+		public void onCompleted(){
+			
+		}
+
+		@Override
+		public void onError(Throwable e) {
+			Toast.makeText(context,"Error!",Toast.LENGTH_SHORT).show();
+		}
+	})
+
+
