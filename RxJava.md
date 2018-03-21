@@ -417,3 +417,50 @@ lift(Operator)。首先看lift()的内部实现：
 
 ## compose:对Observable整体的变换
 除了lift()之外，Observable还有一个变换方法叫做compose(Transformer)。它和lift（）的区别在于，lift()是针对事件项和事件序列的，而compose()是针对Observable自身进行变换。	
+
+``
+
+	public class LifeAllTransformer implements Observable.Transformer<Integer,String> {
+		@Override
+		public Observable<String> call (Observable<Integer> observable) {
+			return observable
+				.lift1()
+				.lift2()
+				.lift3()
+				.lift4();
+		}	
+
+	}
+ 	...
+	Transformer liftAll = new LiftAllTransformer();
+	observable1.compose(liftAll).subscribe(subscriber1);
+
+
+## Scheduler实现线程的自由控制
+1. 前面涉及到可以使用subscribeOn()结合observerOn()实现线程控制，让事件的产生和消费发生在不同的线程。当然也可以实现多次的线程切换，因为observeOn()指定的是Subscriber的线程，而这个Subscriber并不一定是subscribe()参数中的Subscriber,而是observeOn()执行时的当前Observable所对应的Subscriber即是它的直接下级Subscriber。从而，observeOn()指的是它之后的操作所在的线程。因此如果有多次切换线程的需求，只要在每个想要切换线程的位置调用一次observeOn()即可。
+
+通过observeOn()的多次调用，程序实现了线程的多次切换。不同于observeOn(),subscribeOn()的位置放在哪里都可以，但是只能调用一次。
+
+## doOnSubscribe()
+前面提到过Subscriber的onStart()可以用作流程开始前的初始化，然而onStart()由于subscribe()发生时就被调用了，因此不能指定线程，而是只能执行在subscribe()被调用时的线程。
+但是与Subscriver.onStart()相对应的，有一个方法Observable.doOnSubscribe().它和Subscriber.onStart()同样是在subscribe()调用后而且在事件发送前执行，但区别在于它可以指定线程。默认情况下，doOnSubscribe()执行在subscribe()发生的线程；而如果在doOnSubscribe（）之后有subscribeOn()，它将执行在离它最近的subscribeOn（）所指定的线程。
+
+``
+
+	Observable.create(onSubscribe)
+		.subscribeOn(Schedulers.io())
+		.doOnSubscribe(new Action0() {
+			@Override
+			public void call() {
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		})
+		.subscribeOn(AndroidSchedulers.mainThread())
+		.observeOn(AndroidSchedulers.mainThread())
+		.subscribe(subscriber);
+
+RxJava的适用场景和适用方式
+1. 与Retrofit的结合
+2. RxBingding
+3. 各种异步操作
+4. RxBus
