@@ -1,0 +1,13 @@
+## SurfaceView
+
+> SDK文档：SurfaceView就是一个在表层的View,即在窗口上挖一个洞，它是显示在这个洞里，其他的View显示在窗口上，所以View可以显示在SurfaceView之上，也可以添加一些层在SurfaceView之上。从API中可以看出SurfaceView属于View子类，它是专门为制作游戏而产生的，功能强大，而且它支持OpenGL ES库，2D，3D的效果都可以实现，创建SurfaceView的改变、SurfaceView的创建、SurfaceView销毁等，我们可以在相应的方法中做一些比如初始化的操作或者清空的操作。
+
+Android系统提供了View进行绘图处理，我们通过自定义的View可以满足大部分的绘图需求，但是这有个问题就是我们通常自定义的View是用于主动更新情况的，用户无法控制其绘制的速度，由于View是通过invalidate方法通知系统去调用view.onDraw方法进行重绘，而Android系统就通过发出VSYNC信号来进行屏幕的重绘，刷新的时间是16ms,如果在16ms内完成不了执行的操作，用户看着就会卡顿，比如当draw方法里执行的逻辑过多，需要频繁刷新的界面上，如游戏，那么就会不断阻塞主线程，从而导致界面卡顿，而SerfaceView相当于是另一个绘图线程，它不会阻塞主线程，并且它在底层实现机制中实现了双缓冲机制。
+
+## 使用 
+首先SurfaceView也是一个View,它有自己的生命周期，因为它需要在另一个线程来执行绘制操作，所以我么可以在它生命周期的促使阶段开辟一个新线程，执行绘制，在生命周期的结束阶段我们插入结束绘制线程的操作，这些通过其内部的SurfaceHolder对象完成。
+它的绘图原理**是先锁定画布，等绘制结束了再对于画布解锁，最后把画布内容显示到屏幕上。**
+
+1. 创建SurfaceView——	创建自定义SurfaceView继承自SurfaceView，并实现两个接口：SurfaceHolder.Callback和Runnable，其中第一个就是SurfaceView 的生命周期，第二个是实现run()方法。
+2. 初始化
+3. 使用
